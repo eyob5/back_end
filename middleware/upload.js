@@ -13,7 +13,7 @@ const storage = multer.diskStorage({
   const upload = multer({ 
     storage: storage,
     fileFilter:function(req,file,callback){
-        if( file.mimetype == "application/pdf" ||  file.mimetype == "image/jpeg" ||  file.mimetype == "image/png")
+        if(file.mimetype == "image/jpeg" ||  file.mimetype == "image/png")
         {
             callback(null,true)
         }
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
             console.log(file.mimetype);
             callback(null,false); 
         }
-        console.log(file);
+        // console.log(file);
     },
     // limits:{
     //     fileSize:1024 * 1024 * 2

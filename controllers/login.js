@@ -14,6 +14,9 @@ const LoginUser=asyncHandler(async(req,res)=>{
         _id:userExist.id,
         email:userExist.email,
         firstname:userExist.firstname,
+        lastname:userExist.lastname,
+        middlename:userExist.middlename,
+        phoneNo:userExist.phoneNo,
         roll:userExist.roll,
         token:generateToken(userExist._id),
         // ok:"userloged"

@@ -1,32 +1,65 @@
 const asyncHandler = require('express-async-handler');
-const oldshareholder = require('../model/shareamount');
 const { default: mongoose } = require('mongoose');
+const request = require('request');
+const oldshareholder = require('../model/shareamount');
 const createShare=asyncHandler(async(req,res)=>{
-  const {firstname,email,shareamount,paidbirr,lastname,middlename}=req.body;
-  if(!firstname || !middlename || !lastname || !paidbirr || !email || !shareamount){
+  const {firstname,email,shareamount,lastname,middlename,phoneNo}=req.body;
+  if(!firstname || !middlename || !lastname || !phoneNo|| !email || !shareamount){
     res.status(404);
     throw new Error("please fill all fields");
   }
-  const share=await oldshareholder.create({
+  let share=new  oldshareholder({
     firstname,
     middlename,
     lastname,
+    phoneNo,
     email,
     shareamount,
-    paidbirr
 });
-if(share){
-  res.status(201).json({
-    _id:share.id,
-    email:share.email,
-    // password:hashedPassword,
+let options = {
+'method': 'POST',
+'url': 'https://api.chapa.co/v1/transaction/initialize',
+'headers': {
+  'Authorization': `Bearer ${process.env.Secret_key}`,
+  'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+  "amount": req.body.shareamount,
+  "currency": "ETB",
+  "email":req.body.email,
+  "first_name": req.body.firstname,
+  "last_name": req.body.lastname,
+  "phone_number": req.body.phoneNo,
+  "tx_ref": share._id,
+  "callback_url": "http://localhost:8000/api/selltransaction",
+  "return_url": "http://localhost:3000/shareholder/dashboard",
+  "customization[title]": "Payment for my favourite merchant",
+  "customization[description]": "I love online payments"
+})
+};
+try {
+  request(options, async function (error, response) {
+  if (error){
+    return  res.json({
+    error:"something were wrong please cheak ur internet connection"
+  });}
+   const result=await JSON.parse(response.body);
+  res.json({
+    message:result.data.checkout_url
+  })
+  share.save().then(async(response)=>{
+    console.log("saved");
+  })
+    .catch(error=>{
+    console.log(error)
+    res.json({
+      message:"error"
+    })
+  })
   });
-
+} catch (error) {
+  console.log(error)
 }
-  else{
-    res.status(400);
-    throw new Error("can not create");
-  }
 })
 const getoldshareholders=asyncHandler(async(req,res)=>{
   const share=await oldshareholder.find();

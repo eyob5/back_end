@@ -26,10 +26,10 @@ const shareSchema=new schema({
                         type:Number,
                         required:[true,"name filled is required"]
                         },
-                        paidbirr:{
-                            type:Number,
-                            required:[true,"name filled is required"]
-                            }
+                        // paidbirr:{
+                        //     type:Number,
+                        //     required:[true,"name filled is required"]
+                        //     }
 },{
    timestamps:true
 })

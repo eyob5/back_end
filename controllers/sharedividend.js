@@ -11,15 +11,14 @@ async function calculateDividends(req, res) {
 
     // Calculate dividend per share
     const dividendPerShare = profit / totalShares;
-      
+      console.log(dividendPerShare)
     // Calculate and update dividend for each shareholder
     for (let i = 0; i < shareholders.length; i++) {
       const share = shareholders[i];
       const dividend = share.shareamount * dividendPerShare;
       console.log(dividend);
-      share.shareamount.toFixed(2) += dividend;
-      // ${share.shareamount}%;
-      // console.log(${share.shareamount}%);
+      share.shareamount+= dividend;
+      share.shareamount.toPrecision(2);
       await share.save();
     }
 

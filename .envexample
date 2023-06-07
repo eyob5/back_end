@@ -6,3 +6,4 @@ USER='email'
 PASS='password'
 HOST=smtp.gmail.com
 SERVICE=gmail
+Secret_key=yours

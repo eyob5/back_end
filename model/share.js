@@ -4,7 +4,7 @@ const schema=mongoose.Schema;
 const shareSchema=new schema({
     image:{
         type:String,
-        required:[true,"img filled is required"]
+        // required:[true,"image filled is required"]
     },
     firstname:{
         type:String,
@@ -58,10 +58,10 @@ const shareSchema=new schema({
                         type:Number,
                         required:[true,"name filled is required"]
                         },
-                        paidbirr:{
-                            type:Number,
-                            required:[true,"name filled is required"]
-                            }
+                        // paidbirr:{
+                        //     type:Number,
+                        //     required:[true,"name filled is required"]
+                        //     }
 },{
    timestamps:true
 })

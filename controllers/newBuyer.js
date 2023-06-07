@@ -1,7 +1,9 @@
 const asyncHandler = require('express-async-handler');
-const buyers=require('../model/buyshare');
 const bcrypt=require('bcryptjs');
 const  mongoose = require('mongoose');
+const request = require('request');
+const buyers=require('../model/buyshare');
+
 const getNewBuyer=asyncHandler(async (req,res)=>{
     const user=await buyers.find();
     res.json(user);
@@ -17,8 +19,8 @@ const getBuyerById=asyncHandler(async (req,res)=>{
       }
 })
 const createNew=asyncHandler(async(req,res)=>{
-    const {firstname,middlename,lastname,country,email,city,subcity,wereda,password,houseNo,phoneNo,shareamount,paidbirr}=req.body;
-    if( !firstname || !middlename || !lastname  || !country ||!email || !city || !subcity || !password|| !paidbirr|| !wereda || !houseNo || !phoneNo || !shareamount){
+    const {firstname,middlename,lastname,country,email,city,subcity,wereda,password,houseNo,phoneNo,shareamount}=req.body;
+    if( !firstname || !middlename || !lastname  || !country ||!email || !city || !subcity || !password || !wereda || !houseNo || !phoneNo || !shareamount){
       res.status(404);
       throw new Error("please fill all filed");
     }
@@ -27,6 +29,10 @@ const createNew=asyncHandler(async(req,res)=>{
     res.status(404);
     throw new Error("user already exists change your email");
   }
+  // if(shareamount < 1000){
+  //   res.status(404);
+  //   throw new Error("minimum shareamount should be 1000 birr");
+  // }
   const salt=await bcrypt.genSalt(10);
   const hashedPassword=await bcrypt.hash(password,salt);
   let share=new buyers({
@@ -42,50 +48,55 @@ const createNew=asyncHandler(async(req,res)=>{
     houseNo:req.body.houseNo,
     phoneNo:req.body.phoneNo,
     shareamount:req.body.shareamount,
-    paidbirr:req.body.paidbirr
   })
   if(req.file){
     share.image=req.file.path;
-    console.log(req.file);
   }
+let options = {
+  'method': 'POST',
+  'url': 'https://api.chapa.co/v1/transaction/initialize',
+  'headers': {
+    'Authorization': `Bearer ${process.env.Secret_key}`,
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    "amount": req.body.shareamount,
+    "currency": "ETB",
+    "email":req.body.email,
+    "first_name": req.body.firstname,
+    "last_name": req.body.lastname,
+    "phone_number": req.body.phoneNo,
+    "tx_ref": share._id,
+    "callback_url": "http://localhost:8000/api/transaction",
+    "return_url": "http://localhost:3000",
+    "customization[title]": "Payment for buying a share",
+    "customization[description]": "I love online payments"
+  })
+};
+try {
+  request(options, async function (error, response) {
+  if (error){
+    return  res.json({
+    error:"something were wrong please cheak ur internet connection"
+  });}
+   const result=await JSON.parse(response.body);
+  res.json({
+    message:result.data.checkout_url
+  })
   share.save().then(async(response)=>{
-    res.json({
-      message:"saved"
-    })
-  }).catch(error=>{
+    console.log("saved");
+  })
+    .catch(error=>{
+    console.log(error)
     res.json({
       message:"error"
     })
   })
+  });
+} catch (error) {
+  console.log(error)
+}
 })
-//   const share=await buyers.create({
-//     firstname,
-//     middlename,
-//     lastname,
-//     email,
-//     password:hashedPassword,
-//     country,
-//     city,
-//     subcity,
-//     wereda,
-//     houseNo,
-//     phoneNo,
-//     shareamount,
-//     paidbirr
-// });
-// if(share){
-//   res.status(201).json({
-//     _id:share.id,
-//     email:share.email,
-//     password:hashedPassword,
-//   });
-
-// }
-//   else{
-//     res.status(400);
-//     throw new Error("can not create");
-//   }
-// })
 const deleteNewBuyer=asyncHandler(async(req,res)=>{
   const {id}=req.params;
   if(!mongoose.Types.ObjectId.isValid(id)){

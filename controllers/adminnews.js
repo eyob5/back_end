@@ -15,7 +15,6 @@ const createAdminNews=asyncHandler(async(req,res)=>{
   })
   if(req.file){
     admin.image=req.file.path
-    console.log(req.file,req.file.path)
     admin.save().then(()=>{
       res.json({
         message:"saved"
