@@ -82,7 +82,7 @@ const updateShare=asyncHandler(async(req,res)=>{
         }
       const share=await Shareholders.findOneAndUpdate({email},{shareamount:shareExists.shareamount});
        const oneshare=await Shareholders.findOne({email});
-       console.log(oneshare.shareamount,oneshare.paidbirr)   
+       console.log(oneshare.shareamount)   
             res.json(oneshare);
 })
 const deleteShare=asyncHandler(async(req,res)=>{
