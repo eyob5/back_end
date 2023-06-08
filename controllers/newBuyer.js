@@ -3,6 +3,7 @@ const bcrypt=require('bcryptjs');
 const  mongoose = require('mongoose');
 const request = require('request');
 const buyers=require('../model/buyshare');
+const Shareholders = require('../model/share');
 
 const getNewBuyer=asyncHandler(async (req,res)=>{
     const user=await buyers.find();
@@ -28,6 +29,11 @@ const createNew=asyncHandler(async(req,res)=>{
   if(userExist){
     res.status(404);
     throw new Error("user already exists change your email");
+  }
+  const shareExist=await Shareholders.findOne({email});
+  if(shareExist){
+    res.status(404);
+    throw new Error("shareholder already exists change your email");
   }
   // if(shareamount < 1000){
   //   res.status(404);
