@@ -14,6 +14,7 @@ app.use('/api/share',require('./routes/shareapi'));
 app.use('/api/user',require('./routes/userapi'));
 app.use('/api/addshareamount',require('./routes/addshare'));
 app.use('/api/login',require('./routes/loginapi'));
+app.use('/api/contactus',require('./routes/contactus'));
 app.use('/api/adminnews',require('./routes/adminnews'));
 app.use('/api/transaction',require('./routes/transaction'));
 app.use('/api/selltransaction',require('./routes/selltransaction'));
